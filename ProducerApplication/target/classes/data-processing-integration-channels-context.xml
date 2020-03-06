@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+	xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.1.xsd
+		http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.1.xsd">
+
+	<description>Spring Integration Channels Context</description>
+	<import resource="MQ-channels-context.xml" />
+	<int:channel id="controlChannel" />
+	<int:control-bus input-channel="controlChannel" />
+	<int-jms:message-driven-channel-adapter
+		id="inboundAdapter" connection-factory="connectionFactory"
+		destination-name="queue_messages" channel="demoPOCChannel"
+		extract-payload="true" auto-startup="false" />
+	<int:service-activator input-channel="demoPOCChannel"
+		ref="queueMessageListener" method="handleEvent">
+	</int:service-activator>
+	<bean id="queueMessageListener" class="jmsexample.listener.QueueMessageListener" />
+</beans>
